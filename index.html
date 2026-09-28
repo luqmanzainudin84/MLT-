@@ -143,15 +143,19 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 30px;font:400 11px 'Space Mo
   <div class="card" id="formCard" style="display:none">
    <h2><span class="n">+</span><span id="formTitle">REKOD BACAAN</span></h2>
    <div class="grid2">
-    <div><label for="d0">D1 (mm)</label><input id="d0" type="number" inputmode="decimal" step="any"></div>
-    <div><label for="d1">D2 (mm)</label><input id="d1" type="number" inputmode="decimal" step="any"></div>
-    <div><label for="d2">D3 (mm)</label><input id="d2" type="number" inputmode="decimal" step="any"></div>
-    <div><label for="d3">D4 (mm)</label><input id="d3" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d0">LVDT L1 (mm)</label><input id="d0" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d1">LVDT L2 (mm)</label><input id="d1" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d2">LVDT L3 (mm)</label><input id="d2" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d3">LVDT L4 (mm)</label><input id="d3" type="number" inputmode="decimal" step="any"></div>
     <div><label for="fPsi">Tekanan (psi)</label><input id="fPsi" type="number" inputmode="decimal" step="any"></div>
-    <div><label for="fSc">Level: scale cerucuk</label><input id="fSc" type="number" inputmode="decimal" step="any"></div>
-    <div><label for="fTbm">Level: TBM (BS)</label><input id="fTbm" type="number" inputmode="decimal" step="any"></div>
-    <div><label for="fR1">Level: RB1</label><input id="fR1" type="number" inputmode="decimal" step="any"></div>
-    <div class="full"><label for="fR2">Level: RB2</label><input id="fR2" type="number" inputmode="decimal" step="any"></div>
+    <div class="full"><label for="fAct">Actual load (t) &ndash; load cell, jika ada</label><input id="fAct" type="number" inputmode="decimal" step="any"></div>
+    <div class="full" style="margin-top:6px;font:700 11px 'Space Mono',monospace">OPTICAL LEVEL (MM)</div>
+    <div><label for="lv0">Ruler plate 1</label><input id="lv0" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="lv1">Ruler plate 2</label><input id="lv1" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="lv2">Ruler RB 1</label><input id="lv2" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="lv3">Ruler RB 2</label><input id="lv3" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="lv4">Ruler TBM 1</label><input id="lv4" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="lv5">Ruler TBM 2</label><input id="lv5" type="number" inputmode="decimal" step="any"></div>
     <div class="full"><label for="fT">Masa bacaan (kosong = sekarang)</label>
      <div class="row"><input id="fT" type="datetime-local" style="flex:1"><button class="btn sm ghost" data-act="nowT">KINI</button></div></div>
     <div class="full"><label for="fNote">Nota</label><input id="fNote" type="text" placeholder="cth: hujan, jack top-up"></div>
@@ -179,16 +183,17 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 30px;font:400 11px 'Space Mo
    <h2><span class="n">03</span>Jadual bebanan (MOS 1.6.2)</h2>
    <div id="schedBox"></div>
    <div class="warn"><span class="t">&#9888; SEMAK MOS</span>
-    <p>Jadual MOS tulis <b>Total 38 hours 30 min</b>, tapi jumlah masa tahan dalam jadual yang sama = <b>39j 00m</b>. Ini masa MINIMUM; masa sebenar lebih panjang kalau kadar mendap lambat stabil.</p>
+    <p>Jadual MOS tulis <b>Total 38 hours 30 min</b> dan unload akhir 30 min, tapi MLT Record (Appendix D) tahan unload akhir <b>60 min</b>. App ikut Record: jumlah <b>39j 00m</b>. Ini masa MINIMUM; masa sebenar lebih panjang kalau kadar mendap lambat stabil.</p>
     <p>psi dikira: tan &times; 2204.62 &divide; luas jack (in&sup2;). Kalau jack di tapak bukan CLS-5006, tukar luas &amp; semak sijil kalibrasi.</p></div>
   </div>
   <div class="card">
    <h2><span class="n">04</span>Peraturan bacaan</h2>
    <ul class="checks">
-    <li><span class="mk ok">&#8226;</span><span>Tahan 30 min: <b>5 bacaan</b> (app jadualkan setiap 7.5 min).</span></li>
-    <li><span class="mk ok">&#8226;</span><span>100% (Cycle 1): setiap <b>15 min selama 6 jam</b>.</span></li>
-    <li><span class="mk ok">&#8226;</span><span>200%: setiap <b>15 min untuk 2 jam pertama</b>, lepas itu <b>setiap 1 jam</b> (24 jam).</span></li>
-    <li><span class="mk ok">&#8226;</span><span>Tahan 60 min (unload 0% Cycle 1): MOS tak nyatakan; app guna setiap 15 min.</span></li>
+    <li><span class="mk ok">&#8226;</span><span>Ikut <b>MLT Record (Appendix D)</b>. Minit dari mula peringkat:</span></li>
+    <li><span class="mk ok">&#8226;</span><span>Tahan 30 min: <b>0, 2, 8, 15, 30</b></span></li>
+    <li><span class="mk ok">&#8226;</span><span>Unload 0% (60 min): <b>0, 2, 8, 15, 30, 45, 60</b></span></li>
+    <li><span class="mk ok">&#8226;</span><span>100% C1 (6 jam): <b>0, 2, 8, 15, 30 &hellip; 120</b> (setiap 15 min), <b>180, 240, 300</b>, kemudian <b>315, 330, 345, 360</b></span></li>
+    <li><span class="mk ok">&#8226;</span><span>200% C2 (24 jam): <b>0, 2, 8, 15 &hellip; 120</b> (setiap 15 min), kemudian <b>setiap 1 jam</b> hingga 1440</span></li>
     <li><span class="mk ok">&#8226;</span><span>Rekod bacaan SEBELUM &amp; SELEPAS tukar beban (1.6.2 e).</span></li>
     <li><span class="mk ok">&#8226;</span><span>Tak boleh naik beban selagi purata dial berubah &gt; 0.25mm dalam 1 jam (1.6.2 d).</span></li>
    </ul>
@@ -271,7 +276,8 @@ function defStages(){
  a.push({c:1,p:0,t:'U',h:60});
  [25,50,75,100,125,150,175].forEach(function(p){a.push({c:2,p:p,t:'L',h:30});});
  a.push({c:2,p:200,t:'L',h:1440});
- [150,100,50,0].forEach(function(p){a.push({c:2,p:p,t:'U',h:30});});
+ [150,100,50].forEach(function(p){a.push({c:2,p:p,t:'U',h:30});});
+ a.push({c:2,p:0,t:'U',h:60});
  return a;
 }
 function newTest(base){
@@ -280,7 +286,9 @@ function newTest(base){
  return {id:uid('T'),created:Date.now(),cfg:c,stages:defStages(),cur:-1,starts:{},rd:[],ov:[],ended:null};
 }
 function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(DB));$('saveNote').textContent='Disimpan '+fmtClock(Date.now());}catch(e){$('saveNote').textContent='GAGAL SIMPAN - buat backup JSON!';}}
-function load(){try{var s=localStorage.getItem(LS_KEY);if(s){var o=JSON.parse(s);if(o&&o.tests)DB=o;}}catch(e){}
+function migrate(){Object.keys(DB.tests).forEach(function(k){var t=DB.tests[k],L=t.stages[t.stages.length-1];if(L&&L.c===2&&L.p===0&&L.t==='U'&&L.h===30)L.h=60;
+ t.rd.forEach(function(r){if(!r.lv){r.lv=[r.sc==null?null:r.sc,null,r.r1==null?null:r.r1,r.r2==null?null:r.r2,r.tbm==null?null:r.tbm,null];}});});}
+function load(){try{var s=localStorage.getItem(LS_KEY);if(s){var o=JSON.parse(s);if(o&&o.tests)DB=o;}}catch(e){}migrate();
  if(!DB.active||!DB.tests[DB.active]){var k=Object.keys(DB.tests);if(k.length){DB.active=k[0];}else{var t=newTest();DB.tests[t.id]=t;DB.active=t.id;}}}
 function T(){return DB.tests[DB.active];}
 function findRd(t,id){for(var i=0;i<t.rd.length;i++){if(t.rd[i].id===id)return t.rd[i];}return null;}
@@ -301,14 +309,19 @@ function tonsFor(t,psi){var a=cfgN(t,'area');if(!a||psi==null)return null;return
 function nomLoad(t,s){var wl=cfgN(t,'wl')||0;return s.p/100*wl;}
 function stLbl(s){if(s.t==='Z')return 'BACAAN AWAL (SIFAR)';return 'CYCLE '+s.c+' &middot; '+(s.t==='L'?'LOADING':'UNLOADING')+' '+s.p+'%';}
 function stTxt(s){if(s.t==='Z')return 'Bacaan awal 0%';return 'C'+s.c+' '+(s.t==='L'?'Load':'Unload')+' '+s.p+'%';}
-function intv(s,m){if(s.t==='L'&&s.p===200)return m<120?15:60;if(s.h>=60)return 15;return s.h/4;}
-function dues(s){if(s.t==='Z')return [0];var L=[],m=0;while(m<=s.h+0.001){L.push(m);m+=intv(s,m);}return L;}
+function intv(s,m){if(s.t==='L'&&s.p===200)return m<120?15:60;return 15;}
+function dues(s){if(s.t==='Z')return [0];
+ if(s.c===1&&s.p===100&&s.t==='L')return [0,2,8,15,30,45,60,75,90,105,120,180,240,300,315,330,345,360];
+ if(s.p===200&&s.t==='L'){var a=[0,2,8,15,30,45,60,75,90,105,120];for(var m=180;m<=s.h;m+=60)a.push(m);return a;}
+ if(s.h===60)return [0,2,8,15,30,45,60];
+ if(s.h===30)return [0,2,8,15,30];
+ var L=[0,2,8,15].filter(function(x){return x<=s.h;}),q=15;while(q<s.h){q+=intv(s,q);if(q<=s.h+0.001)L.push(q);}return L;}
 function sorted(t){return t.rd.slice().sort(function(a,b){return a.t-b.t;});}
 function stRd(t,i){return sorted(t).filter(function(r){return r.s===i;});}
 function zeroOf(t){var z=stRd(t,0);return z.length?z[0].d:null;}
 function settle(t,r,z){if(z===undefined)z=zeroOf(t);if(!z)return null;var sum=0,n=0;for(var i=0;i<4;i++){if(r.d[i]!=null&&z[i]!=null){sum+=r.d[i]-z[i];n++;}}if(!n)return null;var dir=num(t.cfg.dir)||1;return dir*sum/n;}
 function spread(t,r,z){if(!z)return null;var v=[];for(var i=0;i<4;i++){if(r.d[i]!=null&&z[i]!=null)v.push(r.d[i]-z[i]);}if(v.length<2)return null;return Math.max.apply(null,v)-Math.min.apply(null,v);}
-function rLoad(t,r){if(r.psi!=null){var a=tonsFor(t,r.psi);if(a!=null)return a;}return nomLoad(t,t.stages[r.s]);}
+function rLoad(t,r){if(r.act!=null)return r.act;if(r.psi!=null){var a=tonsFor(t,r.psi);if(a!=null)return a;}return nomLoad(t,t.stages[r.s]);}
 function rateOf(t,i){var z=zeroOf(t),r=stRd(t,i);if(r.length<2)return null;var last=r[r.length-1],ref=null;
  for(var k=0;k<r.length-1;k++){if(r[k].t>=last.t-3600000){ref=r[k];break;}}if(!ref)ref=r[r.length-2];
  var dt=(last.t-ref.t)/60000;if(dt<10)return null;var s1=settle(t,last,z),s0=settle(t,ref,z);if(s1==null||s0==null)return null;
@@ -420,27 +433,27 @@ function updPrev(){var t=T(),d=[0,1,2,3].map(function(i){return num($('d'+i).val
  $('fPrev').innerHTML=h;}
 function clearForm(){var t=T(),all=sorted(t),last=all.length?all[all.length-1]:null;
  for(var i=0;i<4;i++){$('d'+i).value='';$('d'+i).placeholder=(last&&last.d[i]!=null)?String(last.d[i]):'';}
- $('fPsi').value='';$('fPsi').placeholder=(last&&last.psi!=null)?String(last.psi):'';$('fSc').value='';$('fTbm').value='';$('fR1').value='';$('fR2').value='';$('fT').value='';$('fNote').value='';
+ $('fPsi').value='';$('fPsi').placeholder=(last&&last.psi!=null)?String(last.psi):'';for(var q=0;q<6;q++)$('lv'+q).value='';$('fAct').value='';$('fT').value='';$('fNote').value='';
  $('formTitle').textContent='REKOD BACAAN';$('btnCancel').style.display='none';updPrev();}
 function saveRd(){var t=T(),d=[0,1,2,3].map(function(i){return num($('d'+i).value);});
  if(d.every(function(x){return x==null;})){note('Isi sekurang-kurangnya satu bacaan dial gauge.');return;}
  var tv=$('fT').value?fromLocalInput($('fT').value):null;
- var rec={d:d,psi:num($('fPsi').value),sc:num($('fSc').value),tbm:num($('fTbm').value),r1:num($('fR1').value),r2:num($('fR2').value),note:$('fNote').value.replace(/^\s+|\s+$/g,'')};
- if(UI.editId){var r=findRd(t,UI.editId);if(r){r.d=rec.d;r.psi=rec.psi;r.sc=rec.sc;r.tbm=rec.tbm;r.r1=rec.r1;r.r2=rec.r2;r.note=rec.note;if(tv)r.t=tv;}UI.editId=null;}
+ var rec={d:d,psi:num($('fPsi').value),act:num($('fAct').value),lv:[0,1,2,3,4,5].map(function(q){return num($('lv'+q).value);}),note:$('fNote').value.replace(/^\s+|\s+$/g,'')};
+ if(UI.editId){var r=findRd(t,UI.editId);if(r){r.d=rec.d;r.psi=rec.psi;r.act=rec.act;r.lv=rec.lv;r.note=rec.note;if(tv)r.t=tv;}UI.editId=null;}
  else{if(t.cur<0||t.ended){note('Ujian belum mula atau dah tamat.');return;}rec.id=uid('R');rec.t=tv||Date.now();rec.s=t.cur;t.rd.push(rec);}
  save();clearForm();renderAll();}
 function editRd(id){var t=T(),r=findRd(t,id);if(!r)return;UI.editId=id;
  for(var i=0;i<4;i++)$('d'+i).value=r.d[i]==null?'':r.d[i];
- $('fPsi').value=r.psi==null?'':r.psi;$('fSc').value=r.sc==null?'':r.sc;$('fTbm').value=r.tbm==null?'':r.tbm;$('fR1').value=r.r1==null?'':r.r1;$('fR2').value=r.r2==null?'':r.r2;$('fT').value=toLocalInput(r.t);$('fNote').value=r.note||'';
+ $('fPsi').value=r.psi==null?'':r.psi;$('fAct').value=r.act==null?'':r.act;for(var q=0;q<6;q++)$('lv'+q).value=(r.lv&&r.lv[q]!=null)?r.lv[q]:'';$('fT').value=toLocalInput(r.t);$('fNote').value=r.note||'';
  $('formTitle').textContent='EDIT BACAAN - '+stTxt(t.stages[r.s])+' '+fmtClock(r.t);$('btnCancel').style.display='block';
  setTab('pantau');$('formCard').style.display='block';updPrev();$('formCard').scrollIntoView({behavior:'smooth'});}
 
 /* ---------- render: data ---------- */
 function renderData(){var t=T(),z=zeroOf(t),rs=sorted(t),h='';
  if(!rs.length)h='<p class="muted">Tiada bacaan lagi.</p>';
- else{h='<div class="tblwrap"><table><tr><th>#</th><th>Masa</th><th>Peringkat</th><th class="r">Tan</th><th class="r">psi</th><th class="r">D1</th><th class="r">D2</th><th class="r">D3</th><th class="r">D4</th><th class="r">Mendap</th><th class="r">Lv cerucuk</th><th class="r">TBM</th><th class="r">RB1</th><th class="r">RB2</th><th></th></tr>';
+ else{h='<div class="tblwrap"><table><tr><th>#</th><th>Masa</th><th>Peringkat</th><th class="r">Tan</th><th class="r">psi</th><th class="r">L1</th><th class="r">L2</th><th class="r">L3</th><th class="r">L4</th><th class="r">Mendap</th><th class="r">Plate1</th><th class="r">Plate2</th><th class="r">RB1</th><th class="r">RB2</th><th class="r">TBM1</th><th class="r">TBM2</th><th></th></tr>';
   rs.forEach(function(r,k){h+='<tr><td class="num">'+(k+1)+'</td><td class="num">'+fmtDT(r.t)+'</td><td>'+stTxt(t.stages[r.s])+(r.note?'<div class="muted">'+esc(r.note)+'</div>':'')+'</td><td class="num">'+f(rLoad(t,r),1)+'</td><td class="num">'+(r.psi==null?'-':r.psi)+'</td>'+
-   r.d.map(function(x){return '<td class="num">'+f(x,2)+'</td>';}).join('')+'<td class="num"><b>'+f(settle(t,r,z),2)+'</b></td><td class="num">'+f(r.sc,3)+'</td><td class="num">'+f(r.tbm,3)+'</td><td class="num">'+f(r.r1,3)+'</td><td class="num">'+f(r.r2,3)+'</td>'+
+   r.d.map(function(x){return '<td class="num">'+f(x,2)+'</td>';}).join('')+'<td class="num"><b>'+f(settle(t,r,z),2)+'</b></td>'+(r.lv||[null,null,null,null,null,null]).map(function(x){return '<td class="num">'+f(x,1)+'</td>';}).join('')+
    '<td style="white-space:nowrap"><button class="btn sm ghost" data-act="edit" data-id="'+r.id+'">EDIT</button> <button class="btn sm red" data-act="del" data-id="'+r.id+'">&times;</button></td></tr>';});
   h+='</table></div><div class="muted mono" style="margin-top:6px">'+rs.length+' bacaan &middot; mendap = purata (Di - Di sifar)</div>';}
  $('dataBox').innerHTML=h;
@@ -501,10 +514,11 @@ function stamp(){var d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad
 function showCopy(title,txt){ask({title:title,msg:'Kalau fail tak muat turun (contohnya dalam app Claude), tekan SALIN dan tampal ke WhatsApp / Notes / Excel.',text:txt,copy:true,ok:'SALIN',cancel:'TUTUP'});}
 function doCSV(){var t=T(),z=zeroOf(t),L=[];var c=t.cfg;
  [['Projek',c.project],['ID cerucuk',c.pile],['Lokasi',c.loc],['Diameter mm',c.dia],['Panjang m',c.len],['WL tan',c.wl],['Jack',c.jack],['Luas jack in2',c.area],['Kentledge tan',c.kent],['Penguji',c.tester]].forEach(function(r){L.push(r.map(csvCell).join(','));});
- L.push('');L.push(['No','Tarikh masa','Cycle','Peringkat','Beban nominal t','Tekanan psi','Beban dari psi t','D1','D2','D3','D4','Mendap purata mm','Level cerucuk','Level TBM','Level RB1','Level RB2','Nota'].join(','));
+ L.push('');L.push(['No','Tarikh','Time obs','Cycle','% of WL','Design load t','Actual load t','Tekanan psi','L1 mm','L2 mm','L3 mm','L4 mm','LVDT reading avg mm','Total displacement mm','Ruler plate 1','Ruler plate 2','Ruler RB 1','Ruler RB 2','Ruler TBM 1','Ruler TBM 2','Nota'].join(','));
  sorted(t).forEach(function(r,k){var s=t.stages[r.s];var d=new Date(r.t);
-  L.push([k+1,d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()),s.c,stTxt(s),f(nomLoad(t,s),1),r.psi==null?'':r.psi,r.psi==null?'':f(tonsFor(t,r.psi),2),
-   r.d[0]==null?'':r.d[0],r.d[1]==null?'':r.d[1],r.d[2]==null?'':r.d[2],r.d[3]==null?'':r.d[3],f(settle(t,r,z),3),r.sc==null?'':r.sc,r.tbm==null?'':r.tbm,r.r1==null?'':r.r1,r.r2==null?'':r.r2,r.note||''].map(csvCell).join(','));});
+  var dv=r.d.filter(function(x){return x!=null;}),avg=dv.length?dv.reduce(function(a,b){return a+b;},0)/dv.length:null,lvv=r.lv||[];
+  L.push([k+1,d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),pad(d.getHours())+pad(d.getMinutes()),s.c,s.p,f(nomLoad(t,s),1),f(rLoad(t,r),2),r.psi==null?'':r.psi,
+   r.d[0]==null?'':r.d[0],r.d[1]==null?'':r.d[1],r.d[2]==null?'':r.d[2],r.d[3]==null?'':r.d[3],f(avg,3),f(settle(t,r,z),3)].concat([0,1,2,3,4,5].map(function(q){return lvv[q]==null?'':lvv[q];})).concat([r.note||'']).map(csvCell).join(','));});
  L.push('');criteria(t).forEach(function(r){L.push([r.k,f(r.v,2),r.lim==null?'':f(r.lim,2),r.st].map(csvCell).join(','));});
  download('MLT_'+(c.pile||'ujian').replace(/[^A-Za-z0-9_-]+/g,'_')+'_'+stamp()+'.csv','\ufeff'+L.join('\r\n'),'text/csv');showCopy('CSV UJIAN',L.join('\n'));}
 function doJSON(){var j=JSON.stringify(DB);download('MLT_backup_'+stamp()+'.json',j,'application/json');showCopy('BACKUP JSON',j);}
