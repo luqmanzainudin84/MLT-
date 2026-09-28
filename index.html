@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1a1a17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MLT Monitor">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 fill=%27%231a1a17%27/%3E%3Crect y=%2754%27 width=%2764%27 height=%2710%27 fill=%27%23f2c200%27/%3E%3Ctext x=%2732%27 y=%2740%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-weight=%27900%27 font-size=%2722%27 fill=%27%23f2c200%27%3EMLT%3C/text%3E%3C/svg%3E">
+<title>MLT Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light only;--ink:#1a1a17;--paper:#e8e4d8;--paper2:#f0ede3;--line:#c4bfae;--hz:#f2c200;--hzd:#d9a900;--steel:#3a6ea5;--rust:#b0562c;--green:#4a7a3a;--red:#a33025}
+*{box-sizing:border-box}
+html{background:#e8e4d8 !important}
+body{margin:0;color:#1a1a17 !important;background-color:#e8e4d8 !important;background-image:linear-gradient(rgba(196,191,174,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(196,191,174,.35) 1px,transparent 1px);background-size:26px 26px;font-family:'Archivo',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+.mono{font-family:'Space Mono','Courier New',Courier,monospace}
+header .blk{background:#1a1a17 !important;color:#f0ede3 !important;padding:16px 16px 12px}
+.kick{font-size:11px;color:#f2c200;letter-spacing:.08em}
+h1{margin:4px 0 6px;font-weight:900;font-size:30px;letter-spacing:.01em;color:#f2c200 !important;text-transform:uppercase;line-height:1}
+.sub{font-size:12px;color:#e8e4d8}
+.tape{height:10px;background:repeating-linear-gradient(-45deg,#f2c200 0,#f2c200 12px,#1a1a17 12px,#1a1a17 24px)}
+.bar{display:flex;gap:8px;padding:10px 16px;background:#f0ede3 !important;border-bottom:2px solid #1a1a17;align-items:center}
+.bar select{flex:1;min-width:0;font-size:14px;padding:7px 8px}
+nav{position:sticky;top:0;z-index:5;display:flex;overflow-x:auto;background:#1a1a17 !important;border-bottom:3px solid #f2c200}
+nav button{flex:1 0 auto;background:transparent;color:#e8e4d8;border:0;padding:13px 12px;font:700 12px 'Space Mono','Courier New',monospace;letter-spacing:.05em;cursor:pointer}
+nav button.on{background:#f2c200;color:#1a1a17}
+main{max-width:860px;margin:0 auto;padding:4px 16px 30px}
+section{display:none}
+section.on{display:block}
+.card{background:#f0ede3 !important;color:#1a1a17 !important;border:2px solid #1a1a17;padding:14px;margin:14px 0;box-shadow:4px 4px 0 #1a1a17}
+.card h2{margin:0 0 10px;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.03em;display:flex;align-items:center;gap:8px}
+.card h2 .n{background:#1a1a17;color:#f2c200;font:700 11px 'Space Mono','Courier New',monospace;padding:2px 6px}
+label{display:block;font:700 11px 'Space Mono','Courier New',monospace;text-transform:uppercase;letter-spacing:.04em;color:#4a4740;margin:8px 0 3px}
+input,select{width:100%;font:400 16px 'Space Mono','Courier New',monospace;padding:9px 10px;border:2px solid #1a1a17;background:#fffdf6 !important;color:#1a1a17 !important;border-radius:0;-webkit-appearance:none;appearance:none;min-width:0}
+input::placeholder{color:#a8a393}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.full{grid-column:1/-1}
+.btn{display:inline-block;background:#1a1a17;color:#f2c200;border:2px solid #1a1a17;font:700 13px 'Space Mono','Courier New',monospace;padding:12px 14px;letter-spacing:.04em;cursor:pointer;text-transform:uppercase;border-radius:0;text-align:center}
+.btn.hz{background:#f2c200;color:#1a1a17}
+.btn.ghost{background:#f0ede3;color:#1a1a17}
+.btn.red{background:#a33025;border-color:#a33025;color:#fff}
+.btn.sm{padding:6px 9px;font-size:11px}
+.btn.block{display:block;width:100%;margin-top:8px}
+.btn.on{background:#4a7a3a;border-color:#4a7a3a;color:#fff}
+.chip{display:inline-block;font:700 11px 'Space Mono','Courier New',monospace;padding:3px 8px;border:2px solid currentColor;text-transform:uppercase;white-space:nowrap}
+.chip.ok{color:#4a7a3a;background:#e3eddc}
+.chip.bad{color:#a33025;background:#f5dfdb}
+.chip.wait{color:#8a6d00;background:#fbefbf}
+.chip.na{color:#6d6a5e;background:#e6e2d6}
+.warn{background:#f2c200 !important;color:#1a1a17 !important;border:2px solid #1a1a17;padding:10px 12px;margin:12px 0;font-size:14px}
+.warn .t{display:block;font:700 11px 'Space Mono','Courier New',monospace;letter-spacing:.06em;margin-bottom:3px}
+.warn p{margin:4px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1a1a17;color:#f2c200;font:700 10px 'Space Mono','Courier New',monospace;text-transform:uppercase;padding:7px 5px;text-align:left;white-space:nowrap}
+td{border-bottom:1px solid #c4bfae;padding:6px 5px;vertical-align:top}
+th.r{text-align:right}
+td.num{font-family:'Space Mono','Courier New',monospace;text-align:right;white-space:nowrap}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+tr.cur td{background:#fbefbf}
+tr.done td{color:#7a766a}
+.stage{background:#1a1a17 !important;color:#f0ede3 !important;padding:14px;margin:14px 0 0;border:2px solid #1a1a17}
+.stage .lbl{font:700 11px 'Space Mono','Courier New',monospace;color:#f2c200;letter-spacing:.06em}
+.stage .big{font-weight:900;font-size:24px;line-height:1.15;text-transform:uppercase;margin-top:2px}
+.stage .load{font:700 19px 'Space Mono','Courier New',monospace;color:#f2c200;margin-top:4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;border:2px solid #1a1a17;border-top:0;background:#f0ede3 !important;box-shadow:4px 4px 0 #1a1a17}
+.kpi{padding:10px 12px;border-right:1px solid #c4bfae;border-bottom:1px solid #c4bfae;min-width:0}
+.kpi .k{font:700 10px 'Space Mono','Courier New',monospace;text-transform:uppercase;color:#4a4740}
+.kpi .v{font:700 21px 'Space Mono','Courier New',monospace;line-height:1.2}
+.kpi .s{font:400 11px 'Space Mono','Courier New',monospace;color:#4a4740}
+.v.late{color:#a33025}
+.v.ok{color:#4a7a3a}
+.bigS{font:700 38px 'Space Mono','Courier New',monospace;line-height:1}
+.bigS small{font-size:16px}
+.meter{position:relative;height:14px;background:#e0dccf;border:2px solid #1a1a17;margin-top:10px}
+.meter i{position:absolute;left:0;top:0;bottom:0;background:#b0562c}
+.meter b{position:absolute;top:-4px;bottom:-4px;width:2px;background:#a33025}
+.checks{list-style:none;padding:0;margin:0 0 6px}
+.checks li{padding:7px 0;border-bottom:1px dashed #c4bfae;font-size:14px;display:flex;gap:8px}
+.mk{font-weight:700;width:18px;flex:0 0 18px}
+.mk.ok{color:#4a7a3a}
+.mk.bad{color:#a33025}
+.formula{background:#1a1a17 !important;color:#e8e4d8 !important;font:400 13px 'Space Mono','Courier New',monospace;padding:10px 12px;margin:10px 0;overflow-x:auto;line-height:1.6}
+.formula b{color:#f2c200}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:#5a574d;font-size:12px}
+.tools{display:flex;gap:8px;margin-top:14px}
+.tools .btn{flex:1}
+canvas{display:block;width:100%;border:1px solid #c4bfae;background:#fffdf6}
+.cvcap{font:700 11px 'Space Mono','Courier New',monospace;margin:4px 0 0;color:#4a4740}
+#modal{position:fixed;inset:0;z-index:50;background:rgba(26,26,23,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#modal[hidden]{display:none !important}
+#modal .box{background:#f0ede3 !important;color:#1a1a17 !important;border:3px solid #1a1a17;box-shadow:6px 6px 0 #f2c200;max-width:460px;width:100%;padding:16px;max-height:90vh;overflow:auto}
+#modal .box h3{margin:0 0 8px;font-weight:900;text-transform:uppercase;font-size:16px}
+#mMsg{white-space:pre-wrap;font-size:14px;margin-bottom:10px}
+#mTxt{width:100%;height:160px;font:12px 'Space Mono',monospace;border:2px solid #1a1a17;background:#fffdf6;color:#1a1a17}
+.mbtns{display:flex;gap:8px;margin-top:12px}.mbtns .btn{flex:1}
+footer{max-width:860px;margin:0 auto;padding:0 16px 30px;font:400 11px 'Space Mono','Courier New',monospace;color:#5a574d}
+@media (min-width:640px){.kpis{grid-template-columns:repeat(4,1fr)}}
+@media print{
+ nav,.bar,.tools,.btn,#formCard,footer{display:none !important}
+ section{display:none !important}
+ body.printing #sec-keputusan,body.printing #sec-data,body.printing #sec-graf{display:block !important}
+ body{background:#fff !important}
+ .card{box-shadow:none;break-inside:avoid}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="blk">
+  <div class="kick mono">LOG TAPAK &middot; MAINTAINED LOAD TEST</div>
+  <h1>MLT Monitor</h1>
+  <div class="sub mono" id="hdrSub"></div>
+ </div>
+ <div class="tape"></div>
+ <div class="bar">
+  <select id="testSel" aria-label="Pilih ujian"></select>
+  <button class="btn sm" data-act="newTest">+ BARU</button>
+ </div>
+</header>
+
+<nav id="tabs">
+ <button data-tab="pantau">PANTAU</button>
+ <button data-tab="setup">SETUP</button>
+ <button data-tab="data">DATA</button>
+ <button data-tab="graf">GRAF</button>
+ <button data-tab="keputusan">KEPUTUSAN</button>
+</nav>
+
+<main>
+ <!-- ============ PANTAU ============ -->
+ <section id="sec-pantau">
+  <div class="tools">
+   <button class="btn sm ghost" id="btnBeep" data-act="beep">BUNYI: OFF</button>
+   <button class="btn sm ghost" id="btnWake" data-act="wake">SKRIN: AUTO</button>
+  </div>
+  <div id="liveCard"></div>
+  <div class="card" id="formCard" style="display:none">
+   <h2><span class="n">+</span><span id="formTitle">REKOD BACAAN</span></h2>
+   <div class="grid2">
+    <div><label for="d0">D1 (mm)</label><input id="d0" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d1">D2 (mm)</label><input id="d1" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d2">D3 (mm)</label><input id="d2" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="d3">D4 (mm)</label><input id="d3" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="fPsi">Tekanan (psi)</label><input id="fPsi" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="fSc">Level: scale cerucuk</label><input id="fSc" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="fTbm">Level: TBM (BS)</label><input id="fTbm" type="number" inputmode="decimal" step="any"></div>
+    <div><label for="fR1">Level: RB1</label><input id="fR1" type="number" inputmode="decimal" step="any"></div>
+    <div class="full"><label for="fR2">Level: RB2</label><input id="fR2" type="number" inputmode="decimal" step="any"></div>
+    <div class="full"><label for="fT">Masa bacaan (kosong = sekarang)</label>
+     <div class="row"><input id="fT" type="datetime-local" style="flex:1"><button class="btn sm ghost" data-act="nowT">KINI</button></div></div>
+    <div class="full"><label for="fNote">Nota</label><input id="fNote" type="text" placeholder="cth: hujan, jack top-up"></div>
+   </div>
+   <div class="formula" id="fPrev">Masukkan bacaan dial gauge D1-D4.</div>
+   <button class="btn hz block" data-act="saveRd">SIMPAN BACAAN</button>
+   <button class="btn ghost block" data-act="cancelEdit" id="btnCancel" style="display:none">BATAL EDIT</button>
+  </div>
+ </section>
+
+ <!-- ============ SETUP ============ -->
+ <section id="sec-setup">
+  <div class="card">
+   <h2><span class="n">01</span>Maklumat ujian</h2>
+   <div id="cfgBox"></div>
+  </div>
+  <div class="card">
+   <h2><span class="n">02</span>Had penerimaan (MOS 1.7)</h2>
+   <div id="limBox"></div>
+   <div class="warn"><span class="t">&#9888; SILAP BIASA</span>
+    <p>Cerucuk 300mm: had 2.0WL bukan 38mm. MOS kata <b>38mm ATAU 10% diameter, mana lebih rendah</b> = 30mm. Residual pula = 300/120 + 4 = 6.5mm, bukan 12.5mm.</p>
+    <p>Keputusan akhir tetap ikut tafsiran S.O. (MOS 1.7).</p></div>
+  </div>
+  <div class="card">
+   <h2><span class="n">03</span>Jadual bebanan (MOS 1.6.2)</h2>
+   <div id="schedBox"></div>
+   <div class="warn"><span class="t">&#9888; SEMAK MOS</span>
+    <p>Jadual MOS tulis <b>Total 38 hours 30 min</b>, tapi jumlah masa tahan dalam jadual yang sama = <b>39j 00m</b>. Ini masa MINIMUM; masa sebenar lebih panjang kalau kadar mendap lambat stabil.</p>
+    <p>psi dikira: tan &times; 2204.62 &divide; luas jack (in&sup2;). Kalau jack di tapak bukan CLS-5006, tukar luas &amp; semak sijil kalibrasi.</p></div>
+  </div>
+  <div class="card">
+   <h2><span class="n">04</span>Peraturan bacaan</h2>
+   <ul class="checks">
+    <li><span class="mk ok">&#8226;</span><span>Tahan 30 min: <b>5 bacaan</b> (app jadualkan setiap 7.5 min).</span></li>
+    <li><span class="mk ok">&#8226;</span><span>100% (Cycle 1): setiap <b>15 min selama 6 jam</b>.</span></li>
+    <li><span class="mk ok">&#8226;</span><span>200%: setiap <b>15 min untuk 2 jam pertama</b>, lepas itu <b>setiap 1 jam</b> (24 jam).</span></li>
+    <li><span class="mk ok">&#8226;</span><span>Tahan 60 min (unload 0% Cycle 1): MOS tak nyatakan; app guna setiap 15 min.</span></li>
+    <li><span class="mk ok">&#8226;</span><span>Rekod bacaan SEBELUM &amp; SELEPAS tukar beban (1.6.2 e).</span></li>
+    <li><span class="mk ok">&#8226;</span><span>Tak boleh naik beban selagi purata dial berubah &gt; 0.25mm dalam 1 jam (1.6.2 d).</span></li>
+   </ul>
+   <div class="warn"><span class="t">&#9888; TAFSIRAN 0.25 MM/JAM</span>
+    <p>Tahan 30 min tak cukup sejam untuk ukur terus. App kira <b>kadar</b> = perubahan mendap &divide; masa &times; 60 (guna tetingkap 60 min terakhir kalau ada). Sahkan tafsiran ini dengan S.O./RE sebelum ujian.</p></div>
+  </div>
+  <div class="card">
+   <h2><span class="n">05</span>Urus ujian ini</h2>
+   <button class="btn red block" data-act="delTest">PADAM UJIAN INI</button>
+  </div>
+ </section>
+
+ <!-- ============ DATA ============ -->
+ <section id="sec-data">
+  <div class="card">
+   <h2><span class="n">LOG</span>Semua bacaan</h2>
+   <div id="dataBox"></div>
+  </div>
+  <div class="card" id="ovCard">
+   <h2><span class="n">!</span>Override (naik tanpa cukup syarat)</h2>
+   <div id="ovBox"></div>
+  </div>
+ </section>
+
+ <!-- ============ GRAF ============ -->
+ <section id="sec-graf">
+  <div class="card"><h2><span class="n">G1</span>Load vs Time</h2><canvas id="cv1"></canvas></div>
+  <div class="card"><h2><span class="n">G2</span>Settlement vs Time</h2><canvas id="cv2"></canvas><div class="cvcap" id="cap2"></div></div>
+  <div class="card"><h2><span class="n">G3</span>Settlement vs Load</h2><canvas id="cv3"></canvas><div class="cvcap" id="cap3"></div></div>
+ </section>
+
+ <!-- ============ KEPUTUSAN ============ -->
+ <section id="sec-keputusan">
+  <div class="card">
+   <h2><span class="n">OK?</span>Semakan kriteria</h2>
+   <div id="resBox"></div>
+  </div>
+  <div class="card">
+   <h2><span class="n">&#8595;</span>Eksport &amp; backup</h2>
+   <button class="btn hz block" data-act="csv">EKSPORT CSV (EXCEL)</button>
+   <button class="btn block" data-act="print">CETAK / PDF LAPORAN</button>
+   <button class="btn ghost block" data-act="json">BACKUP SEMUA (JSON)</button>
+   <button class="btn ghost block" data-act="imp">IMPORT BACKUP</button>
+   <input type="file" id="impFile" accept=".json,application/json" style="display:none">
+   <div class="warn"><span class="t">&#9888; DATA DISIMPAN DALAM PERANTI INI SAHAJA</span>
+    <p>Data tak sync antara telefon. Kalau tukar syif/peranti: BACKUP JSON &rarr; hantar WhatsApp &rarr; IMPORT di peranti lain. Buat backup sekurang-kurangnya setiap tukar peringkat.</p></div>
+  </div>
+ </section>
+</main>
+<div id="modal" hidden><div class="box" role="dialog" aria-modal="true"><h3 id="mTitle"></h3><div id="mMsg"></div><input id="mIn" type="text" hidden><textarea id="mTxt" readonly hidden></textarea><div class="mbtns"><button class="btn ghost" id="mCancel" type="button">BATAL</button><button class="btn hz" id="mOk" type="button">OK</button></div></div></div>
+<footer id="foot">MLT Monitor &middot; ikut MOS MLT CAJ Maju Rev.00 &middot; <span id="saveNote"></span></footer>
+
+<script>
+(function(){
+'use strict';
+var LS_KEY='mlt_monitor_v1';
+var DB={tests:{},active:null};
+var UI={tab:'pantau',editId:null,beep:false,actx:null,dueKey:'',wake:null,wakeOn:false,sig:''};
+
+/* ---------- util ---------- */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function num(v){if(v===''||v==null)return null;var n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n;}
+function f(n,d){return (n==null||isNaN(n))?'-':Number(n).toFixed(d==null?2:d);}
+function pad(n){return (n<10?'0':'')+n;}
+function fmtClock(ms){var d=new Date(ms);return pad(d.getHours())+':'+pad(d.getMinutes());}
+function fmtDT(ms){var d=new Date(ms);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes());}
+function fmtDur(ms){var neg=ms<0;ms=Math.abs(ms);var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;return (neg?'-':'')+(h>0?h+':'+pad(m):m)+':'+pad(x);}
+function fmtMin(m){var h=Math.floor(m/60),mm=Math.round(m-h*60);return h>0?(h+'j '+pad(mm)+'m'):(mm+'m');}
+function toLocalInput(ms){var d=new Date(ms);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());}
+function fromLocalInput(v){var m=String(v).match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/);if(!m)return null;return new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime();}
+function uid(p){return (p||'T')+Date.now().toString(36)+Math.floor(Math.random()*1000);}
+
+/* ---------- data ---------- */
+function defStages(){
+ var a=[{c:0,p:0,t:'Z',h:0}];
+ [25,50,75].forEach(function(p){a.push({c:1,p:p,t:'L',h:30});});
+ a.push({c:1,p:100,t:'L',h:360});
+ a.push({c:1,p:50,t:'U',h:30});
+ a.push({c:1,p:0,t:'U',h:60});
+ [25,50,75,100,125,150,175].forEach(function(p){a.push({c:2,p:p,t:'L',h:30});});
+ a.push({c:2,p:200,t:'L',h:1440});
+ [150,100,50,0].forEach(function(p){a.push({c:2,p:p,t:'U',h:30});});
+ return a;
+}
+function newTest(base){
+ var c={project:'JPD Gentes - RPS Kemar, Hulu Perak',pile:'',loc:'',dia:300,len:'',wl:100,area:113.15,jack:'Enerpac CLS-5006',kent:'',tester:'',dir:1};
+ if(base){['project','dia','len','wl','area','jack','kent','tester','dir'].forEach(function(k){c[k]=base[k];});}
+ return {id:uid('T'),created:Date.now(),cfg:c,stages:defStages(),cur:-1,starts:{},rd:[],ov:[],ended:null};
+}
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(DB));$('saveNote').textContent='Disimpan '+fmtClock(Date.now());}catch(e){$('saveNote').textContent='GAGAL SIMPAN - buat backup JSON!';}}
+function load(){try{var s=localStorage.getItem(LS_KEY);if(s){var o=JSON.parse(s);if(o&&o.tests)DB=o;}}catch(e){}
+ if(!DB.active||!DB.tests[DB.active]){var k=Object.keys(DB.tests);if(k.length){DB.active=k[0];}else{var t=newTest();DB.tests[t.id]=t;DB.active=t.id;}}}
+function T(){return DB.tests[DB.active];}
+function findRd(t,id){for(var i=0;i<t.rd.length;i++){if(t.rd[i].id===id)return t.rd[i];}return null;}
+
+/* ---------- dialog ---------- */
+var MCB=null,MOPT={};
+function ask(o,cb){MOPT=o;MCB=cb||null;$('mTitle').textContent=o.title||'SAHKAN';$('mMsg').textContent=o.msg||'';
+ var mi=$('mIn');mi.hidden=!o.input;mi.value=o.def||'';mi.placeholder=o.ph||'';
+ var mt=$('mTxt');mt.hidden=!o.text;mt.value=o.text||'';
+ $('mOk').textContent=o.ok||'OK';$('mCancel').hidden=!!o.noCancel;$('mCancel').textContent=o.cancel||'BATAL';
+ $('modal').hidden=false;if(o.input)setTimeout(function(){mi.focus();},50);}
+function closeM(){$('modal').hidden=true;}
+function note(msg,title){ask({title:title||'MAKLUMAN',msg:msg,noCancel:true});}
+/* ---------- kiraan ---------- */
+function cfgN(t,k){return num(t.cfg[k]);}
+function psiFor(t,tons){var a=cfgN(t,'area');if(!a)return null;return Math.floor(tons*1000*2.20462262/a);}
+function tonsFor(t,psi){var a=cfgN(t,'area');if(!a||psi==null)return null;return psi*a/2204.62262;}
+function nomLoad(t,s){var wl=cfgN(t,'wl')||0;return s.p/100*wl;}
+function stLbl(s){if(s.t==='Z')return 'BACAAN AWAL (SIFAR)';return 'CYCLE '+s.c+' &middot; '+(s.t==='L'?'LOADING':'UNLOADING')+' '+s.p+'%';}
+function stTxt(s){if(s.t==='Z')return 'Bacaan awal 0%';return 'C'+s.c+' '+(s.t==='L'?'Load':'Unload')+' '+s.p+'%';}
+function intv(s,m){if(s.t==='L'&&s.p===200)return m<120?15:60;if(s.h>=60)return 15;return s.h/4;}
+function dues(s){if(s.t==='Z')return [0];var L=[],m=0;while(m<=s.h+0.001){L.push(m);m+=intv(s,m);}return L;}
+function sorted(t){return t.rd.slice().sort(function(a,b){return a.t-b.t;});}
+function stRd(t,i){return sorted(t).filter(function(r){return r.s===i;});}
+function zeroOf(t){var z=stRd(t,0);return z.length?z[0].d:null;}
+function settle(t,r,z){if(z===undefined)z=zeroOf(t);if(!z)return null;var sum=0,n=0;for(var i=0;i<4;i++){if(r.d[i]!=null&&z[i]!=null){sum+=r.d[i]-z[i];n++;}}if(!n)return null;var dir=num(t.cfg.dir)||1;return dir*sum/n;}
+function spread(t,r,z){if(!z)return null;var v=[];for(var i=0;i<4;i++){if(r.d[i]!=null&&z[i]!=null)v.push(r.d[i]-z[i]);}if(v.length<2)return null;return Math.max.apply(null,v)-Math.min.apply(null,v);}
+function rLoad(t,r){if(r.psi!=null){var a=tonsFor(t,r.psi);if(a!=null)return a;}return nomLoad(t,t.stages[r.s]);}
+function rateOf(t,i){var z=zeroOf(t),r=stRd(t,i);if(r.length<2)return null;var last=r[r.length-1],ref=null;
+ for(var k=0;k<r.length-1;k++){if(r[k].t>=last.t-3600000){ref=r[k];break;}}if(!ref)ref=r[r.length-2];
+ var dt=(last.t-ref.t)/60000;if(dt<10)return null;var s1=settle(t,last,z),s0=settle(t,ref,z);if(s1==null||s0==null)return null;
+ return {ds:s1-s0,dt:dt,rate:(s1-s0)/dt*60};}
+function gate(t){var i=t.cur,s=t.stages[i],now=Date.now(),st=t.starts[i]||now;var r=stRd(t,i),dl=dues(s);
+ var g={el:(now-st)/60000,n:r.length,need:dl.length,rt:rateOf(t,i)};
+ g.holdOk=g.el>=s.h;g.rdOk=r.length>=dl.length;
+ if(s.t==='L'){g.rateReq=true;g.rateOk=!!(g.rt&&Math.abs(g.rt.rate)<=0.25);}else{g.rateReq=false;g.rateOk=true;}
+ if(s.t==='Z'){g.holdOk=true;g.rdOk=r.length>=1;}
+ g.all=g.holdOk&&g.rdOk&&g.rateOk;return g;}
+function idxOf(t,c,p,ty){for(var i=0;i<t.stages.length;i++){var s=t.stages[i];if(s.c===c&&s.p===p&&s.t===ty)return i;}return -1;}
+function maxS(t,i){var z=zeroOf(t),m=null;stRd(t,i).forEach(function(r){var v=settle(t,r,z);if(v!=null&&(m==null||v>m))m=v;});return m;}
+function lastS(t,i){var r=stRd(t,i);if(!r.length)return null;return settle(t,r[r.length-1]);}
+function limits(t){var D=cfgN(t,'dia')||0,L=cfgN(t,'len')||0;var lf=L>30?1+0.022*(L-30):1;
+ return {lf:lf,wl:12.5,wl2:Math.min(38,0.1*D)*lf,res:Math.min(D/120+4,12.5)*lf,D:D,L:L};}
+function criteria(t){var lm=limits(t);var a=idxOf(t,1,100,'L'),b=idxOf(t,1,0,'U'),c=idxOf(t,2,200,'L'),e=t.stages.length-1;
+ var rows=[
+  {k:'Mendap @ 1.0 WL (Cycle 1)',v:maxS(t,a),lim:lm.wl,i:a,ref:'1.7'},
+  {k:'Residual selepas unload Cycle 1',v:lastS(t,b),lim:lm.res,i:b,ref:'1.7 (ii)'},
+  {k:'Mendap @ 2.0 WL (Cycle 2)',v:maxS(t,c),lim:lm.wl2,i:c,ref:'1.7 (i)'},
+  {k:'Residual akhir (Cycle 2)',v:lastS(t,e),lim:null,i:e,ref:'rekod sahaja'}];
+ rows.forEach(function(r){var done=!!t.ended||t.cur>r.i;
+  if(r.v==null)r.st='na';else if(r.lim==null)r.st='info';else if(r.v>r.lim)r.st='bad';else r.st=done?'ok':'wait';});
+ return rows;}
+function chipFor(st){if(st==='ok')return '<span class="chip ok">LULUS</span>';if(st==='bad')return '<span class="chip bad">GAGAL</span>';if(st==='wait')return '<span class="chip wait">SEDANG</span>';if(st==='info')return '<span class="chip na">INFO</span>';return '<span class="chip na">BELUM</span>';}
+
+/* ---------- render: header ---------- */
+function renderHeader(){var t=T(),s=(t.cur>=0&&!t.ended)?t.stages[t.cur]:null;
+ $('hdrSub').innerHTML=esc(t.cfg.pile||'Cerucuk tanpa ID')+(t.cfg.loc?' &middot; '+esc(t.cfg.loc):'')+' &middot; '+(t.ended?'SELESAI':(s?stTxt(s):'BELUM MULA'));
+ var h='';Object.keys(DB.tests).map(function(k){return DB.tests[k];}).sort(function(a,b){return b.created-a.created;}).forEach(function(x){
+  h+='<option value="'+x.id+'"'+(x.id===DB.active?' selected':'')+'>'+esc(x.cfg.pile||'Ujian tanpa ID')+' - '+fmtDT(x.created)+(x.ended?' (siap)':'')+'</option>';});
+ $('testSel').innerHTML=h;}
+
+/* ---------- render: setup ---------- */
+var FIELDS=[['project','Projek','text',1],['pile','ID cerucuk','text'],['loc','Lokasi / chainage','text'],['dia','Diameter (mm)','num'],['len','Panjang cerucuk (m)','num'],['wl','Working load (tan)','num'],['area','Luas jack (in&sup2;)','num'],['jack','Model jack','text'],['kent','Berat kentledge (tan)','num'],['tester','Penguji','text']];
+function renderSetupForm(){var t=T(),h='<div class="grid2">';
+ FIELDS.forEach(function(F){h+='<div'+(F[3]?' class="full"':'')+'><label>'+F[1]+'</label><input data-k="'+F[0]+'" type="'+(F[2]==='num'?'number':'text')+'"'+(F[2]==='num'?' inputmode="decimal" step="any"':'')+' value="'+esc(t.cfg[F[0]])+'"></div>';});
+ var neg=String(t.cfg.dir)==='-1';
+ h+='<div class="full"><label>Arah bacaan dial gauge</label><select data-k="dir"><option value="1"'+(neg?'':' selected')+'>Bacaan BERTAMBAH bila cerucuk mendap</option><option value="-1"'+(neg?' selected':'')+'>Bacaan BERKURANG bila cerucuk mendap</option></select></div></div>';
+ $('cfgBox').innerHTML=h;}
+function limitsHtml(t){var lm=limits(t);
+ return '<div class="formula">D = '+f(lm.D,0)+' mm &middot; L = '+(lm.L?f(lm.L,1)+' m':'-')+' &middot; faktor panjang f = '+f(lm.lf,3)+
+ '<br>1.0 WL : had = <b>12.50 mm</b>'+
+ '<br>2.0 WL : min(38, 0.1&times;D) &times; f = <b>'+f(lm.wl2,2)+' mm</b>'+
+ '<br>Residual : min(D/120 + 4, 12.5) &times; f = <b>'+f(lm.res,2)+' mm</b>'+
+ (lm.L>30?'<br>Cerucuk &gt; 30m: had dinaikkan 2.2%/m (1.7 iii)':'')+'</div>';}
+function renderLimits(){var t=T(),wl=cfgN(t,'wl')||0,k=cfgN(t,'kent'),need=1.2*2*wl;
+ var h=limitsHtml(t)+'<div class="row" style="justify-content:space-between"><span class="mono" style="font-size:13px">Kentledge &ge; 120% test load = <b>'+f(need,1)+' t</b></span>'+
+ (k==null?'<span class="chip na">ISI BERAT</span>':(k>=need?'<span class="chip ok">CUKUP '+f(k,1)+' t</span>':'<span class="chip bad">KURANG '+f(k,1)+' t</span>'))+'</div>';
+ $('limBox').innerHTML=h;}
+function renderSched(){var t=T(),cum=0,h='<div class="tblwrap"><table><tr><th>#</th><th>Peringkat</th><th class="r">Tan</th><th class="r">psi</th><th class="r">Tahan</th><th class="r">Bil</th><th class="r">Kumulatif</th></tr>';
+ t.stages.forEach(function(s,i){cum+=s.h;var cls=(i===t.cur&&!t.ended)?'cur':((i<t.cur||t.ended)?'done':'');var L=nomLoad(t,s),p=psiFor(t,L);
+  h+='<tr class="'+cls+'"><td class="num">'+i+'</td><td>'+stTxt(s)+'</td><td class="num">'+f(L,1)+'</td><td class="num">'+(p==null?'-':p)+'</td><td class="num">'+(s.h>=60?fmtMin(s.h):s.h+'m')+'</td><td class="num">'+dues(s).length+'</td><td class="num">'+fmtMin(cum)+'</td></tr>';});
+ h+='</table></div><div class="muted mono" style="margin-top:6px">Jumlah masa tahan minimum: <b>'+fmtMin(cum)+'</b></div>';
+ $('schedBox').innerHTML=h;}
+
+/* ---------- render: pantau ---------- */
+function kpi(k,v,s,cls,id){return '<div class="kpi"><div class="k">'+k+'</div><div class="v '+(cls||'')+'"'+(id?' id="'+id+'"':'')+'>'+v+'</div><div class="s">'+s+'</div></div>';}
+function chk(ok,txt){return '<li><span class="mk '+(ok?'ok':'bad')+'">'+(ok?'&#10003;':'&#10007;')+'</span><span>'+txt+'</span></li>';}
+function liveState(t){var s=t.stages[t.cur],g=gate(t),now=Date.now(),st=t.starts[t.cur],dl=dues(s);
+ var nd=g.n<dl.length?st+dl[g.n]*60000:null,rem=nd==null?null:nd-now;
+ return {s:s,g:g,now:now,st:st,nd:nd,rem:rem,sig:[t.id,t.cur,g.holdOk,g.rdOk,g.rateOk,g.n,(rem!=null&&rem<=0),UI.editId].join('|')};}
+function renderLive(){var t=T(),el=$('liveCard'),fc=$('formCard');
+ if(t.cur<0){UI.sig='';fc.style.display='none';
+  el.innerHTML='<div class="card"><h2><span class="n">00</span>Belum mula</h2><p>Semak tab <b>SETUP</b> dulu: ID cerucuk, WL, luas jack, berat kentledge.</p><p>Tekan MULA bila jack, 4 dial gauge, reference beam &amp; scale dah dipasang. Bacaan pertama = sifar rujukan.</p><label for="startT">Masa mula ujian (kalau dah mula tadi, ubah di sini)</label><input id="startT" type="datetime-local" value="'+toLocalInput(Date.now())+'"><button class="btn hz block" data-act="start">MULA UJIAN</button></div>';return;}
+ if(t.ended){UI.sig='';fc.style.display=UI.editId?'block':'none';
+  el.innerHTML='<div class="card"><h2><span class="n">OK</span>Ujian selesai</h2><p class="mono" style="font-size:13px">Mula: '+fmtDT(t.starts[0])+'<br>Tamat: '+fmtDT(t.ended)+'<br>Tempoh: '+fmtDur(t.ended-t.starts[0])+'</p><button class="btn hz block" data-act="goRes">LIHAT KEPUTUSAN</button><button class="btn ghost sm block" data-act="reopen">Buka semula peringkat akhir</button></div>';return;}
+ fc.style.display='block';
+ var L=liveState(t),s=L.s,g=L.g;UI.sig=L.sig;
+ if(L.rem!=null&&L.rem<=0){var key=t.id+'-'+t.cur+'-'+g.n;if(UI.dueKey!==key){UI.dueKey=key;alertDue();}}
+ var z=zeroOf(t),all=sorted(t),lastR=all.length?all[all.length-1]:null,sNow=(lastR&&z)?settle(t,lastR,z):null;
+ var load=nomLoad(t,s),psi=psiFor(t,load),nx=t.stages[t.cur+1],lm=limits(t);
+ var h='<div class="stage"><div class="lbl">PERINGKAT '+t.cur+' / '+(t.stages.length-1)+' &middot; MULA '+fmtClock(L.st)+'</div><div class="big">'+stLbl(s)+'</div><div class="load">'+f(load,1)+' t &middot; '+(psi==null?'-':psi)+' psi</div></div>';
+ h+='<div class="kpis">'+
+  kpi('Masa tahan',fmtDur(L.now-L.st),'min '+(s.h>=60?fmtMin(s.h):s.h+' min'),g.holdOk?'ok':'','kTime')+
+  kpi('Bacaan seterusnya',L.nd==null?'CUKUP':(L.rem<=0?'SEKARANG':fmtDur(L.rem)),L.nd==null?'semua bacaan wajib diambil':'dijadual '+fmtClock(L.nd),(L.rem!=null&&L.rem<=0)?'late':'','kNext')+
+  kpi('Bil. bacaan',g.n+'/'+g.need,'peringkat ini',g.rdOk?'ok':'')+
+  kpi('Kadar mendap',g.rt?f(g.rt.rate,2):'-',g.rt?'mm/jam ('+f(g.rt.ds,2)+'mm/'+Math.round(g.rt.dt)+'min)':'perlu data &ge; 10 min',g.rateReq?(g.rateOk?'ok':'late'):'')+'</div>';
+ var pct=(sNow!=null&&lm.wl2>0)?Math.max(0,Math.min(100,sNow/lm.wl2*100)):0,mk=lm.wl2>0?Math.min(100,lm.wl/lm.wl2*100):0;
+ h+='<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-end"><div><label style="margin-top:0">Mendap semasa (purata 4 dial)</label><div class="bigS">'+(z?f(sNow,2):'-')+' <small>mm</small></div></div>'+
+  '<div class="muted mono" style="text-align:right">had 1.0WL '+f(lm.wl,1)+'<br>had 2.0WL '+f(lm.wl2,1)+'</div></div>'+
+  '<div class="meter"><i style="width:'+pct.toFixed(1)+'%"></i><b style="left:'+mk.toFixed(1)+'%"></b></div><div class="muted mono" style="margin-top:4px">bar = mendap / had 2.0WL &middot; garis merah = had 1.0WL</div></div>';
+ h+='<div class="card"><h2><span class="n">GO?</span>Syarat tukar beban</h2><ul class="checks">'+
+  (s.t==='Z'?chk(g.rdOk,'Bacaan sifar diambil'):chk(g.holdOk,'Masa tahan minimum ('+(s.h>=60?fmtMin(s.h):s.h+' min')+')')+chk(g.rdOk,'Bacaan cukup ('+g.n+'/'+g.need+')'))+
+  (g.rateReq?chk(g.rateOk,'Kadar mendap &le; 0.25 mm/jam (1.6.2 d)'):'')+'</ul>';
+ if(nx){var nl=nomLoad(t,nx);h+='<div class="muted mono">Seterusnya: <b>'+stTxt(nx)+'</b> &middot; '+f(nl,1)+' t &middot; '+psiFor(t,nl)+' psi</div>';}
+ else h+='<div class="muted mono">Ini peringkat terakhir.</div>';
+ h+='<div class="muted" style="margin-top:6px">Ambil bacaan SEBELUM tekan butang (1.6.2 e).</div>';
+ var lbl=nx?((nx.t==='L'||s.t==='Z')?'NAIK KE '+nx.p+'%':'TURUN KE '+nx.p+'%'):'TAMAT UJIAN';
+ h+='<button class="btn '+(g.all?'hz':'ghost')+' block" data-act="next">'+lbl+'</button>';
+ h+='<button class="btn ghost sm block" data-act="setStart">Ubah masa mula peringkat ini ('+fmtClock(L.st)+')</button>';
+ if(t.cur>0&&stRd(t,t.cur).length===0)h+='<button class="btn ghost sm block" data-act="undo">Undur peringkat (salah tekan)</button>';
+ h+='</div>';
+ el.innerHTML=h;}
+function tick(){var t=T();if(UI.tab!=='pantau'||t.cur<0||t.ended)return;var L=liveState(t);
+ if(L.sig!==UI.sig){renderLive();return;}
+ var a=$('kTime');if(a)a.textContent=fmtDur(L.now-L.st);
+ var b=$('kNext');if(b&&L.rem!=null)b.textContent=L.rem<=0?'SEKARANG':fmtDur(L.rem);}
+
+/* ---------- borang bacaan ---------- */
+function updPrev(){var t=T(),d=[0,1,2,3].map(function(i){return num($('d'+i).value);}),z=zeroOf(t),ed=UI.editId?findRd(t,UI.editId):null,h='';
+ var z0=stRd(t,0)[0],isZero=(!z&&!ed&&t.cur===0)||(ed&&z0&&z0.id===ed.id);
+ if(d.every(function(x){return x==null;}))h='Masukkan bacaan dial gauge D1-D4.';
+ else if(isZero)h='Bacaan ini jadi <b>SIFAR RUJUKAN</b> untuk semua mendap.';
+ else if(!z)h='Belum ada bacaan sifar.';
+ else{var r={d:d},S=settle(t,r,z),sp=spread(t,r,z);h='Mendap purata = <b>'+f(S,2)+' mm</b>'+(sp!=null?' &middot; julat antara gauge '+f(sp,2)+' mm':'');}
+ var p=num($('fPsi').value);
+ if(p!=null){var tn=tonsFor(t,p);h+='<br>'+p+' psi = <b>'+f(tn,1)+' t</b>';var s=ed?t.stages[ed.s]:(t.cur>=0?t.stages[t.cur]:null);if(s){var tg=nomLoad(t,s);if(tg>0)h+=' (sasaran '+f(tg,1)+' t, beza '+f((tn-tg)/tg*100,1)+'%)';}}
+ $('fPrev').innerHTML=h;}
+function clearForm(){var t=T(),all=sorted(t),last=all.length?all[all.length-1]:null;
+ for(var i=0;i<4;i++){$('d'+i).value='';$('d'+i).placeholder=(last&&last.d[i]!=null)?String(last.d[i]):'';}
+ $('fPsi').value='';$('fPsi').placeholder=(last&&last.psi!=null)?String(last.psi):'';$('fSc').value='';$('fTbm').value='';$('fR1').value='';$('fR2').value='';$('fT').value='';$('fNote').value='';
+ $('formTitle').textContent='REKOD BACAAN';$('btnCancel').style.display='none';updPrev();}
+function saveRd(){var t=T(),d=[0,1,2,3].map(function(i){return num($('d'+i).value);});
+ if(d.every(function(x){return x==null;})){note('Isi sekurang-kurangnya satu bacaan dial gauge.');return;}
+ var tv=$('fT').value?fromLocalInput($('fT').value):null;
+ var rec={d:d,psi:num($('fPsi').value),sc:num($('fSc').value),tbm:num($('fTbm').value),r1:num($('fR1').value),r2:num($('fR2').value),note:$('fNote').value.replace(/^\s+|\s+$/g,'')};
+ if(UI.editId){var r=findRd(t,UI.editId);if(r){r.d=rec.d;r.psi=rec.psi;r.sc=rec.sc;r.tbm=rec.tbm;r.r1=rec.r1;r.r2=rec.r2;r.note=rec.note;if(tv)r.t=tv;}UI.editId=null;}
+ else{if(t.cur<0||t.ended){note('Ujian belum mula atau dah tamat.');return;}rec.id=uid('R');rec.t=tv||Date.now();rec.s=t.cur;t.rd.push(rec);}
+ save();clearForm();renderAll();}
+function editRd(id){var t=T(),r=findRd(t,id);if(!r)return;UI.editId=id;
+ for(var i=0;i<4;i++)$('d'+i).value=r.d[i]==null?'':r.d[i];
+ $('fPsi').value=r.psi==null?'':r.psi;$('fSc').value=r.sc==null?'':r.sc;$('fTbm').value=r.tbm==null?'':r.tbm;$('fR1').value=r.r1==null?'':r.r1;$('fR2').value=r.r2==null?'':r.r2;$('fT').value=toLocalInput(r.t);$('fNote').value=r.note||'';
+ $('formTitle').textContent='EDIT BACAAN - '+stTxt(t.stages[r.s])+' '+fmtClock(r.t);$('btnCancel').style.display='block';
+ setTab('pantau');$('formCard').style.display='block';updPrev();$('formCard').scrollIntoView({behavior:'smooth'});}
+
+/* ---------- render: data ---------- */
+function renderData(){var t=T(),z=zeroOf(t),rs=sorted(t),h='';
+ if(!rs.length)h='<p class="muted">Tiada bacaan lagi.</p>';
+ else{h='<div class="tblwrap"><table><tr><th>#</th><th>Masa</th><th>Peringkat</th><th class="r">Tan</th><th class="r">psi</th><th class="r">D1</th><th class="r">D2</th><th class="r">D3</th><th class="r">D4</th><th class="r">Mendap</th><th class="r">Lv cerucuk</th><th class="r">TBM</th><th class="r">RB1</th><th class="r">RB2</th><th></th></tr>';
+  rs.forEach(function(r,k){h+='<tr><td class="num">'+(k+1)+'</td><td class="num">'+fmtDT(r.t)+'</td><td>'+stTxt(t.stages[r.s])+(r.note?'<div class="muted">'+esc(r.note)+'</div>':'')+'</td><td class="num">'+f(rLoad(t,r),1)+'</td><td class="num">'+(r.psi==null?'-':r.psi)+'</td>'+
+   r.d.map(function(x){return '<td class="num">'+f(x,2)+'</td>';}).join('')+'<td class="num"><b>'+f(settle(t,r,z),2)+'</b></td><td class="num">'+f(r.sc,3)+'</td><td class="num">'+f(r.tbm,3)+'</td><td class="num">'+f(r.r1,3)+'</td><td class="num">'+f(r.r2,3)+'</td>'+
+   '<td style="white-space:nowrap"><button class="btn sm ghost" data-act="edit" data-id="'+r.id+'">EDIT</button> <button class="btn sm red" data-act="del" data-id="'+r.id+'">&times;</button></td></tr>';});
+  h+='</table></div><div class="muted mono" style="margin-top:6px">'+rs.length+' bacaan &middot; mendap = purata (Di - Di sifar)</div>';}
+ $('dataBox').innerHTML=h;
+ var o='';if(!t.ov.length)o='<p class="muted">Tiada. Bagus.</p>';
+ else t.ov.forEach(function(x){o+='<div style="padding:6px 0;border-bottom:1px dashed #c4bfae"><span class="mono" style="font-size:12px">'+fmtDT(x.t)+' &middot; '+stTxt(t.stages[x.s])+'</span><br><b>'+esc(x.miss)+'</b><br>Sebab: '+esc(x.why)+'</div>';});
+ $('ovBox').innerHTML=o;}
+
+/* ---------- graf ---------- */
+function ticks(a,b,n){if(b-a<1e-9)b=a+1;var raw=(b-a)/n,p=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),m=raw/p,st=(m<1.5?1:(m<3?2:(m<7?5:10)))*p;
+ var s0=Math.floor(a/st)*st,e=Math.ceil(b/st)*st,L=[];for(var v=s0;v<=e+st*0.001;v+=st)L.push(Math.round(v/st)*st);return {a:s0,b:e,st:st,L:L};}
+function lab(v,st){var d=st>=1?0:(st>=0.1?1:2);return v.toFixed(d);}
+function drawChart(cv,series,o){var W=Math.max(260,(cv.parentNode.clientWidth||320)-32),H=250,dpr=window.devicePixelRatio||1;
+ cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.height=H+'px';var c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+ c.fillStyle='#fffdf6';c.fillRect(0,0,W,H);c.font='11px "Space Mono","Courier New",monospace';c.fillStyle='#1a1a17';
+ var xs=[],ys=[];series.forEach(function(s){s.pts.forEach(function(p){xs.push(p.x);ys.push(p.y);});});
+ if(!xs.length){c.textAlign='center';c.fillText('Tiada data lagi',W/2,H/2);return;}
+ var x0=Math.min.apply(null,xs),x1=Math.max.apply(null,xs),y0=Math.min.apply(null,ys),y1=Math.max.apply(null,ys);
+ if(o.x0!=null)x0=Math.min(x0,o.x0);if(o.y0!=null)y0=Math.min(y0,o.y0);
+ var tx=ticks(x0,x1,5),ty=ticks(y0,y1,5),L=46,R=10,Tp=12,B=34,pw=W-L-R,ph=H-Tp-B;
+ function X(v){return L+(v-tx.a)/(tx.b-tx.a)*pw;}
+ function Y(v){var r=(v-ty.a)/(ty.b-ty.a);return o.inv?Tp+r*ph:Tp+ph-r*ph;}
+ c.strokeStyle='#e0dccf';c.lineWidth=1;c.fillStyle='#4a4740';
+ tx.L.forEach(function(v){var x=X(v);c.beginPath();c.moveTo(x,Tp);c.lineTo(x,Tp+ph);c.stroke();c.textAlign='center';c.fillText(lab(v,tx.st),x,Tp+ph+14);});
+ ty.L.forEach(function(v){var y=Y(v);c.beginPath();c.moveTo(L,y);c.lineTo(L+pw,y);c.stroke();c.textAlign='right';c.fillText(lab(v,ty.st),L-5,y+4);});
+ c.strokeStyle='#1a1a17';c.lineWidth=1.5;c.strokeRect(L,Tp,pw,ph);
+ (o.lim||[]).forEach(function(l){if(l.y<ty.a||l.y>ty.b)return;var y=Y(l.y);c.save();c.setLineDash([6,4]);c.strokeStyle='#a33025';c.beginPath();c.moveTo(L,y);c.lineTo(L+pw,y);c.stroke();c.restore();c.fillStyle='#a33025';c.textAlign='left';c.fillText(l.l,L+4,y-4);});
+ series.forEach(function(s){c.strokeStyle=s.col;c.fillStyle=s.col;c.lineWidth=2;c.beginPath();
+  s.pts.forEach(function(p,k){var x=X(p.x),y=Y(p.y);if(k===0)c.moveTo(x,y);else if(s.step){c.lineTo(x,Y(s.pts[k-1].y));c.lineTo(x,y);}else c.lineTo(x,y);});c.stroke();
+  s.pts.forEach(function(p){c.beginPath();c.arc(X(p.x),Y(p.y),2.6,0,6.2832);c.fill();});});
+ c.fillStyle='#1a1a17';c.textAlign='center';c.fillText(o.xl,L+pw/2,H-4);c.save();c.translate(11,Tp+ph/2);c.rotate(-Math.PI/2);c.fillText(o.yl,0,0);c.restore();}
+function renderCharts(){var t=T(),z=zeroOf(t),rs=sorted(t),t0=t.starts[0]||(rs[0]?rs[0].t:0),lt=[],st=[],sl=[],lm=limits(t);
+ rs.forEach(function(r){var x=(r.t-t0)/3600000,Ld=rLoad(t,r),S=settle(t,r,z);lt.push({x:x,y:Ld});if(S!=null){st.push({x:x,y:S});sl.push({x:Ld,y:S});}});
+ var lim=[{y:lm.wl,l:'had 1.0WL '+f(lm.wl,1)},{y:lm.wl2,l:'had 2.0WL '+f(lm.wl2,1)}];
+ drawChart($('cv1'),[{pts:lt,col:'#3a6ea5',step:true}],{xl:'Masa (jam)',yl:'Beban (t)',y0:0,x0:0});
+ drawChart($('cv2'),[{pts:st,col:'#b0562c'}],{xl:'Masa (jam)',yl:'Mendap (mm)',inv:true,y0:0,x0:0,lim:lim});
+ drawChart($('cv3'),[{pts:sl,col:'#1a1a17'}],{xl:'Beban (t)',yl:'Mendap (mm)',inv:true,y0:0,x0:0,lim:lim});
+ var cap='Paksi mendap ke bawah. Garis had muncul bila skala sampai.';$('cap2').textContent=cap;$('cap3').textContent=cap;}
+
+/* ---------- keputusan ---------- */
+function renderResult(){var t=T(),rows=criteria(t),h='<div class="tblwrap"><table><tr><th>Kriteria</th><th class="r">Ukur mm</th><th class="r">Had mm</th><th>Status</th></tr>';
+ rows.forEach(function(r){h+='<tr><td>'+r.k+'<div class="muted mono">MOS '+r.ref+'</div></td><td class="num">'+f(r.v,2)+'</td><td class="num">'+(r.lim==null?'-':f(r.lim,2))+'</td><td>'+chipFor(r.st)+'</td></tr>';});
+ h+='</table></div>';
+ var main=rows.slice(0,3),anyBad=main.some(function(r){return r.st==='bad';}),allOk=main.every(function(r){return r.st==='ok';});
+ var ov=anyBad?'<span class="chip bad">GAGAL</span>':((allOk&&t.ended)?'<span class="chip ok">LULUS</span>':'<span class="chip wait">BELUM LENGKAP</span>');
+ var z=zeroOf(t),mx=null;sorted(t).forEach(function(r){var v=settle(t,r,z);if(v!=null&&(mx==null||v>mx))mx=v;});
+ h+='<div class="row" style="justify-content:space-between;margin-top:12px"><b>KEPUTUSAN KESELURUHAN</b>'+ov+'</div>';
+ h+='<div class="formula">Cerucuk : <b>'+esc(t.cfg.pile||'-')+'</b> '+esc(t.cfg.loc||'')+'<br>WL : '+f(cfgN(t,'wl'),1)+' t &middot; Test load : '+f(2*(cfgN(t,'wl')||0),1)+' t'+
+  '<br>Mula : '+(t.starts[0]?fmtDT(t.starts[0]):'-')+' &middot; Tamat : '+(t.ended?fmtDT(t.ended):'-')+
+  (t.starts[0]?'<br>Tempoh : '+fmtDur((t.ended||Date.now())-t.starts[0]):'')+
+  '<br>Bacaan : '+t.rd.length+' &middot; Mendap maks : <b>'+f(mx,2)+' mm</b> &middot; Override : '+t.ov.length+'</div>';
+ h+=limitsHtml(t)+'<div class="muted">Tafsiran &amp; kesimpulan S.O. adalah muktamad (MOS 1.7). App ini alat bantu pantau, bukan kelulusan.</div>';
+ $('resBox').innerHTML=h;}
+
+/* ---------- eksport ---------- */
+function csvCell(v){v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function download(name,txt,type){var blob=new Blob([txt],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},500);}
+function stamp(){var d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes());}
+function showCopy(title,txt){ask({title:title,msg:'Kalau fail tak muat turun (contohnya dalam app Claude), tekan SALIN dan tampal ke WhatsApp / Notes / Excel.',text:txt,copy:true,ok:'SALIN',cancel:'TUTUP'});}
+function doCSV(){var t=T(),z=zeroOf(t),L=[];var c=t.cfg;
+ [['Projek',c.project],['ID cerucuk',c.pile],['Lokasi',c.loc],['Diameter mm',c.dia],['Panjang m',c.len],['WL tan',c.wl],['Jack',c.jack],['Luas jack in2',c.area],['Kentledge tan',c.kent],['Penguji',c.tester]].forEach(function(r){L.push(r.map(csvCell).join(','));});
+ L.push('');L.push(['No','Tarikh masa','Cycle','Peringkat','Beban nominal t','Tekanan psi','Beban dari psi t','D1','D2','D3','D4','Mendap purata mm','Level cerucuk','Level TBM','Level RB1','Level RB2','Nota'].join(','));
+ sorted(t).forEach(function(r,k){var s=t.stages[r.s];var d=new Date(r.t);
+  L.push([k+1,d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()),s.c,stTxt(s),f(nomLoad(t,s),1),r.psi==null?'':r.psi,r.psi==null?'':f(tonsFor(t,r.psi),2),
+   r.d[0]==null?'':r.d[0],r.d[1]==null?'':r.d[1],r.d[2]==null?'':r.d[2],r.d[3]==null?'':r.d[3],f(settle(t,r,z),3),r.sc==null?'':r.sc,r.tbm==null?'':r.tbm,r.r1==null?'':r.r1,r.r2==null?'':r.r2,r.note||''].map(csvCell).join(','));});
+ L.push('');criteria(t).forEach(function(r){L.push([r.k,f(r.v,2),r.lim==null?'':f(r.lim,2),r.st].map(csvCell).join(','));});
+ download('MLT_'+(c.pile||'ujian').replace(/[^A-Za-z0-9_-]+/g,'_')+'_'+stamp()+'.csv','\ufeff'+L.join('\r\n'),'text/csv');showCopy('CSV UJIAN',L.join('\n'));}
+function doJSON(){var j=JSON.stringify(DB);download('MLT_backup_'+stamp()+'.json',j,'application/json');showCopy('BACKUP JSON',j);}
+function doImport(file){var fr=new FileReader();fr.onload=function(){try{var o=JSON.parse(fr.result),list=[];
+  if(o.tests)Object.keys(o.tests).forEach(function(k){list.push(o.tests[k]);});else if(o.cfg&&o.stages)list.push(o);else throw new Error('x');
+  list.forEach(function(x){DB.tests[x.id]=x;DB.active=x.id;});
+  save();renderSetupForm();clearForm();renderAll();note(list.length+' ujian diimport.');}catch(e){note('Fail backup tak sah.');}};fr.readAsText(file);}
+function doPrint(){document.body.className='printing';renderResult();renderData();renderCharts();setTimeout(function(){window.print();},300);}
+window.addEventListener('afterprint',function(){document.body.className='';setTab(UI.tab);});
+
+/* ---------- bunyi & skrin ---------- */
+function alertDue(){try{if(navigator.vibrate)navigator.vibrate([300,150,300]);}catch(e){}
+ if(!UI.beep||!UI.actx)return;try{var c=UI.actx;[0,0.35].forEach(function(dl){var o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=880;g.gain.value=0.12;o.connect(g);g.connect(c.destination);o.start(c.currentTime+dl);o.stop(c.currentTime+dl+0.22);});}catch(e){}}
+function toggleBeep(){UI.beep=!UI.beep;if(UI.beep&&!UI.actx){var AC=window.AudioContext||window.webkitAudioContext;if(AC){UI.actx=new AC();}}
+ if(UI.actx&&UI.actx.resume)UI.actx.resume();if(UI.beep){var k=UI.dueKey;UI.dueKey='';alertDue();UI.dueKey=k;}updToggles();}
+function reqWake(){try{navigator.wakeLock.request('screen').then(function(w){UI.wake=w;}).catch(function(){UI.wakeOn=false;updToggles();});}catch(e){UI.wakeOn=false;updToggles();}}
+function toggleWake(){if(!('wakeLock' in navigator)){note('Peranti ini tak sokong kunci skrin. Set Auto-Lock telefon ke "Never" semasa ujian.');return;}
+ UI.wakeOn=!UI.wakeOn;if(UI.wakeOn)reqWake();else if(UI.wake){try{UI.wake.release();}catch(e){}UI.wake=null;}updToggles();}
+function updToggles(){var a=$('btnBeep'),b=$('btnWake');a.textContent='BUNYI: '+(UI.beep?'ON':'OFF');a.className='btn sm '+(UI.beep?'on':'ghost');b.textContent='SKRIN: '+(UI.wakeOn?'SENTIASA ON':'AUTO');b.className='btn sm '+(UI.wakeOn?'on':'ghost');}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){if(UI.wakeOn)reqWake();UI.sig='';renderLive();}});
+
+/* ---------- aksi ---------- */
+function setTab(n){UI.tab=n;var bs=document.querySelectorAll('#tabs button');for(var i=0;i<bs.length;i++)bs[i].className=bs[i].getAttribute('data-tab')===n?'on':'';
+ var ss=document.querySelectorAll('main section');for(var j=0;j<ss.length;j++)ss[j].className=ss[j].id==='sec-'+n?'on':'';
+ if(n==='graf')renderCharts();if(n==='keputusan')renderResult();if(n==='data')renderData();if(n==='pantau'){UI.sig='';renderLive();}window.scrollTo(0,0);}
+function doNext(){var t=T(),g=gate(t),nx=t.stages[t.cur+1],miss=[];
+ if(!g.holdOk)miss.push('masa tahan belum cukup');if(!g.rdOk)miss.push('bacaan belum cukup ('+g.n+'/'+g.need+')');if(!g.rateOk)miss.push('kadar mendap > 0.25 mm/jam atau data belum cukup');
+ var go=function(){var now=Date.now();if(nx){t.cur++;t.starts[t.cur]=now;}else t.ended=now;save();renderAll();window.scrollTo(0,0);};
+ if(miss.length){ask({title:'SYARAT BELUM CUKUP',msg:miss.join('\n')+'\n\nTaip sebab untuk teruskan. Sebab ini direkod dalam laporan.',input:true,ph:'cth: arahan RE',ok:'TERUSKAN'},function(why){t.ov.push({t:Date.now(),s:t.cur,why:why||'(tiada sebab)',miss:miss.join('; ')});go();});}
+ else ask({title:nx?'TUKAR BEBAN':'TAMAT UJIAN',msg:nx?('Tukar ke '+stTxt(nx)+'\n'+f(nomLoad(t,nx),1)+' t = '+psiFor(t,nomLoad(t,nx))+' psi'):'Tamatkan ujian sekarang?',ok:nx?'YA, TUKAR':'YA, TAMAT'},go);}
+var ACT={
+ start:function(){var t=T();if(!cfgN(t,'wl')||!cfgN(t,'area')){note('Isi Working load dan luas jack di SETUP dulu.');setTab('setup');return;}
+  var sv=$('startT')&&$('startT').value?fromLocalInput($('startT').value):null;
+  var go=function(){t.cur=0;t.starts[0]=sv||Date.now();save();clearForm();renderAll();};
+  if(!t.cfg.pile)ask({msg:'ID cerucuk masih kosong. Teruskan juga?',ok:'TERUSKAN'},go);else go();},
+ next:doNext,
+ undo:function(){var t=T();if(t.cur>0&&stRd(t,t.cur).length===0)ask({msg:'Undur ke peringkat sebelumnya?',ok:'UNDUR'},function(){delete t.starts[t.cur];t.cur--;save();renderAll();});},
+ setStart:function(){var t=T(),cur=t.starts[t.cur];ask({title:'MASA MULA PERINGKAT',msg:'Masa sebenar peringkat ini bermula (HH:MM, 24 jam). Contoh: 18:19',input:true,def:fmtClock(cur),ok:'SIMPAN'},function(v){
+  var m=String(v).match(/^\s*(\d{1,2})[:.](\d{2})\s*$/);if(!m){note('Format salah. Guna HH:MM, contoh 18:19');return;}
+  var d=new Date(cur);d.setHours(+m[1],+m[2],0,0);var ms=d.getTime();if(ms>Date.now()+60000)ms-=86400000;
+  if(t.cur>0&&ms<t.starts[t.cur-1]){note('Masa ini lebih awal dari peringkat sebelumnya.');return;}t.starts[t.cur]=ms;save();renderAll();});},
+ reopen:function(){var t=T();ask({msg:'Buka semula peringkat akhir untuk tambah bacaan?',ok:'BUKA'},function(){t.ended=null;save();renderAll();});},
+ goRes:function(){setTab('keputusan');},
+ nowT:function(){$('fT').value=toLocalInput(Date.now());},
+ saveRd:saveRd,
+ cancelEdit:function(){UI.editId=null;clearForm();renderAll();},
+ edit:editRd,
+ del:function(id){var t=T(),r=findRd(t,id);if(!r)return;var z0=stRd(t,0)[0];ask({title:'PADAM BACAAN',msg:(z0&&z0.id===id?'INI BACAAN SIFAR - semua mendap akan berubah!\n':'')+'Padam bacaan '+fmtDT(r.t)+'?',ok:'PADAM'},function(){t.rd=t.rd.filter(function(x){return x.id!==id;});save();renderAll();});},
+ newTest:function(){ask({msg:'Mula ujian baru untuk cerucuk lain? Ujian semasa kekal tersimpan.',ok:'UJIAN BARU'},function(){var n=newTest(T().cfg);DB.tests[n.id]=n;DB.active=n.id;UI.editId=null;save();renderSetupForm();clearForm();renderAll();setTab('setup');});},
+ delTest:function(){var t=T();ask({title:'PADAM UJIAN',msg:'Padam ujian "'+(t.cfg.pile||'tanpa ID')+'" dan semua '+t.rd.length+' bacaan? Tak boleh undo.\nTaip PADAM untuk sahkan.',input:true,ok:'PADAM'},function(v){if(String(v).toUpperCase()!=='PADAM')return;delete DB.tests[t.id];DB.active=null;load();save();renderSetupForm();clearForm();renderAll();});},
+ csv:doCSV,json:doJSON,imp:function(){$('impFile').click();},print:doPrint,beep:toggleBeep,wake:toggleWake
+};
+document.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('[data-act],[data-tab]'):null;if(!b)return;
+ var tb=b.getAttribute('data-tab');if(tb){setTab(tb);return;}var a=b.getAttribute('data-act');if(ACT[a])ACT[a](b.getAttribute('data-id'));});
+$('testSel').addEventListener('change',function(){DB.active=this.value;UI.editId=null;save();renderSetupForm();clearForm();renderAll();});
+function onCfg(e){var k=e.target.getAttribute('data-k');if(!k)return;T().cfg[k]=e.target.value;save();renderHeader();renderSched();renderLimits();}
+$('cfgBox').addEventListener('input',onCfg);$('cfgBox').addEventListener('change',onCfg);
+['d0','d1','d2','d3','fPsi'].forEach(function(id){$(id).addEventListener('input',updPrev);});
+$('mOk').addEventListener('click',function(){var o=MOPT,cb=MCB,v=true;
+ if(o.copy){var ta=$('mTxt');var done=function(){$('mOk').textContent='DISALIN';};try{navigator.clipboard.writeText(ta.value).then(done,function(){ta.hidden=false;ta.select();});}catch(e){ta.select();}return;}
+ if(o.input)v=$('mIn').value;closeM();if(cb)cb(v);});
+$('mCancel').addEventListener('click',function(){closeM();if(MOPT.onCancel)MOPT.onCancel();});
+$('impFile').addEventListener('change',function(){if(this.files&&this.files[0])doImport(this.files[0]);this.value='';});
+var rsz=null;window.addEventListener('resize',function(){clearTimeout(rsz);rsz=setTimeout(function(){if(UI.tab==='graf')renderCharts();},200);});
+
+function renderAll(){renderHeader();renderSched();renderLimits();renderData();renderResult();UI.sig='';renderLive();if(UI.tab==='graf')renderCharts();}
+
+/* ---------- mula ---------- */
+load();renderSetupForm();clearForm();renderAll();setTab(T().cur<0&&!T().cfg.pile?'setup':'pantau');updToggles();
+setInterval(tick,1000);
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(function(){});}
+})();
+</script>
+</body>
+</html>
